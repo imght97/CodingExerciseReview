@@ -1,0 +1,131 @@
+//题目：两条单链表逆序存储了两整数，要求求和并以同样形式返回一单链表。
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+//自己代码：
+class Solution {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        int num[100] = {0};
+        int Addtion[101] = {0};
+        int i = 0;
+        int nodeNumeber = 1;
+        while(l1 != nullptr && l2 != nullptr){  
+            if(l1->val + l2->val + Addtion[i] >= 10){
+                num[i] = l1->val + l2->val + Addtion[i] - 10;
+                Addtion[i+1] = 1;
+            }
+            else{
+                num[i] = l1->val + l2->val + Addtion[i];
+            }
+            l1 = l1->next;
+            l2 = l2->next;
+            if(l1 != nullptr ||l2 != nullptr){
+                i++;
+                nodeNumeber++;
+            }
+            else if(l1 == nullptr && l2 == nullptr && Addtion[i+1] == 1){
+                num[i+1] = 1;
+                i++;
+                nodeNumeber++;
+            }
+        }
+        if(l1 == nullptr && l2 != nullptr){
+            while(l2 != nullptr){
+                if(l2->val + Addtion[i]>= 10){
+                    num[i] = l2->val + Addtion[i] - 10;
+                    Addtion[i+1] = 1;
+                }
+                else{
+                    num[i] = l2->val + Addtion[i];
+                }
+                l2 = l2->next;
+                if(l2 != nullptr){
+                    i++;
+                    nodeNumeber++;
+                }
+            }
+            if(Addtion[i+1] == 1){
+                num[i+1] = 1;
+                i++;
+                nodeNumeber++;
+            }
+        }
+        else if(l1 != nullptr && l2 == nullptr){
+            while(l1 != nullptr){
+                if(l1->val + Addtion[i]>= 10){
+                    num[i] = l1->val + Addtion[i] - 10;
+                    Addtion[i+1] = 1;
+                }
+                else{
+                    num[i] = l1->val + Addtion[i];
+                }
+                l1 = l1->next;
+                if(l1 != nullptr){
+                    i++;
+                    nodeNumeber++;
+                }
+            }
+            if(Addtion[i+1] == 1){
+                num[i+1] = 1;
+                i++;
+                nodeNumeber++;
+            }
+        }
+        ListNode* head = new ListNode;
+        head->val = num[0];
+        head->next = nullptr;
+        nodeNumeber--;
+        for(nodeNumeber;nodeNumeber>0;nodeNumeber--){
+            ListNode* l = new ListNode;
+            l->val = num[i];
+            l->next = head->next;
+            head->next = l;
+            i--;
+        }
+        return head;
+    }
+};
+//自己思路：两链对应结点的和分别存储在两数组中，一个数组表示当前位的运算结果，另一数组表示进位。再从数组尾部开始读取数据采用头插法建链表。
+
+//示例代码：
+class Solution {
+public:
+
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        int addition = (l1->val + l2->val) / 10;                  //初始化下一位是否进位
+        ListNode * head = new ListNode((l1->val + l2->val) % 10);
+        ListNode * pre = head;                                    //※尾插法需要维护当前链表尾指针※
+        l1 = l1->next;
+        l2 = l2->next;
+        while(l1 != NULL && l2 != NULL){
+            int val = l1->val + l2->val + addition;
+            addition = val / 10;
+            ListNode * cur = new ListNode(val % 10);
+            pre->next = cur;
+            pre = cur;
+            l1 = l1->next;
+            l2 = l2->next;
+        }                                                         //两链均非空时，所需操作：算数，创新结点，连链。
+        ListNode * l = l1 == NULL ? l2 : l1;                      //※需要学习：对两链进行操作，某一链空了而需要取另一链非空的剩余部分时，可以采用此方法。※
+        while(l != NULL){
+            int val = l->val + addition;
+            addition = val / 10;
+            l->val = val % 10;
+            pre->next = l;
+            pre = l;
+            l = l->next;
+        }
+        if(addition == 1){
+            pre->next = new ListNode(1);
+        }                                                         //要注意两数相加之后要进一位的特殊情况。
+        return head;
+    }
+};
