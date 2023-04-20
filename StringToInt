@@ -1,0 +1,95 @@
+//题目要求：写一个函数 StrToInt，实现把字符串转换成整数这个功能
+class Solution {
+public:
+    int strToInt(string str) {
+        int i = 0;
+        int flag = 1;
+        while (str[i] == ' '){
+            i++;
+        }
+        if (str[i] == '+' ) {
+            i++;
+        }
+        else if (str[i] == '-'){
+            i++;
+            flag = 0;
+        }
+        while (str[i] == '0'){
+            i++;
+        }
+        //进入读取数字环节
+        if (str[i] > '9' || str[i] < '0'){
+            return 0;
+        }
+        int iCopy = i;
+        int count = 0;
+        while (str[i] <= '9' && str[i] >= '0'){
+            count++;
+            i++;
+        }
+        if (flag == 1 && count > 10) return 2147483647;
+        if (flag == 0 && count > 10) return -2147483648;
+        long long retInt = 0;
+        while(str[iCopy] <= '9' && str[iCopy] >= '0'){
+            retInt = retInt + (str[iCopy] - 48) * pow(10, count-1);
+            count--;
+            iCopy++;
+        }
+        
+        if(flag == 1){
+            if(retInt >= 2147483647){
+                return 2147483647;
+            }
+            else return (int)retInt;
+        }
+        else if(flag == 0){
+            if(retInt >= 2147483648){
+                return -2147483648;
+            }
+            else return -((int)retInt);
+        } 
+        return 0;
+    }
+};
+/*复盘：写复杂的原因：（1）自己转数字的思路：想用count求出总共的位数，然后再从低位到高位累加上去。
+                         但其实有 sum = sum * 10 + num[i] 这种从高位往低位加数的字符串转数字的方法。
+                     （2）没想到用if和break的组合实时判断是否越界，如果想到的话就不用多个地方return了
+//示例：
+class Solution {
+public:
+    int strToInt(string str) {
+        bool isNegitive = false;
+        long long int tmpRet = 0;
+        int ret=0;
+        int idx = 0;
+        while (str[idx]==' ')
+            idx += 1;
+        if (str[idx]=='-') {
+            isNegitive = true;
+            idx += 1;
+        }
+        else if (str[idx]=='+') {
+            idx += 1;
+        }
+        if (str[idx]>='0' && str[idx]<='9') {
+            while (str[idx]>='0' && str[idx]<='9') {
+                if (tmpRet>=2147483648) {
+                    break;
+                }
+                int curNum = str[idx] - '0';
+                tmpRet = tmpRet * 10 + curNum;
+                idx += 1;
+            }
+        }
+        // cout << tmpRet <<endl;
+        if (isNegitive)
+            tmpRet *= -1;
+        // cout << tmpRet <<endl;
+        if (tmpRet<=-2147483648)
+            tmpRet = -2147483648;
+        else if (tmpRet >= 2147483648)
+            tmpRet = 2147483647;
+        ret = tmpRet;
+        return ret;
+    }
+};
